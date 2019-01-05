@@ -16,9 +16,37 @@ public class Main {
         EntityManager em = entityManagerFactory.createEntityManager();
         //inserir dados
         try {
-            buscarId();
+            listarTodos();
+            delete();
+            listarTodos();
         } catch (Exception e) {
             System.out.println("UPDATE: " + e.getMessage());
+        } finally {
+            em.close();
+        }
+    }
+
+    public static void delete() {
+        entityManagerFactory = Persistence.createEntityManagerFactory("hibernatejpa");
+        //necessário pra acessar as funções de persistencia
+        EntityManager em = entityManagerFactory.createEntityManager();
+
+        Lembrete lembretes = null;
+        Scanner scanner = new Scanner(System.in);
+        try {
+            System.out.println("informe o numero da tarefa que será deletada");
+            Long x = Long.parseLong(scanner.nextLine().toString());
+            lembretes = em.find(Lembrete.class, x.longValue());
+            System.out.println("Deletando lembrete: " + x);
+            //deleção
+            em.getTransaction().begin();
+            em.remove(lembretes);
+            em.getTransaction().commit();
+            System.out.println("ITEM:" + lembretes);
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+
+            System.out.println("DELETE:" + e.getMessage());
         } finally {
             em.close();
         }
